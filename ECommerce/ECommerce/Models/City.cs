@@ -17,8 +17,13 @@ namespace ECommerce.Models
         public string Name { get; set; }
 
         [Required]
+        [Range(1,double.MaxValue)]
         public int DepartmentId { get; set; }
-
+        
+        //obtenemos el id de departamento
         public virtual Department Department { get; set; }
+        
+        //Relacion con la tabla Compania 
+        public virtual ICollection<Company> Companies { get; set; }
     }
 }
