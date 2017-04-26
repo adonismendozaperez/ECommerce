@@ -12,7 +12,7 @@ namespace ECommerce.Models
         [Key]
         public int CompanyId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "The field {0} is required.")]
         [MaxLength(50)]
         [Display(Name ="company")]
         [Index("companyName",IsUnique =true)]

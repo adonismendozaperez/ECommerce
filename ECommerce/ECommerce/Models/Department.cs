@@ -22,5 +22,7 @@ namespace ECommerce.Models
         public virtual ICollection<City> Cities { get; set; }
         //relacion con la tabla compania
         public virtual ICollection<Company> Companies { get; set; }
+        //relacion con la tabla Usuario
+        public virtual ICollection<User> Users { get; set; }
     }
 }

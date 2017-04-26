@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ECommerce.Classes;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -15,11 +16,19 @@ namespace ECommerce
         protected void Application_Start()
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<Models.ECommerceContext, Migrations.Configuration>());
+            CheckRoleAndSuperUser();
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        private void CheckRoleAndSuperUser()
+        {
+            UsersHelper.CheckRole("Admin");
+            UsersHelper.CheckRole("user");
+            UsersHelper.CheckSuperUser();
         }
     }
 }

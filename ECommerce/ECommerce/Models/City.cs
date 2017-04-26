@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -14,10 +15,12 @@ namespace ECommerce.Models
         [Required]
         [MaxLength(50)]
         [Display(Name ="City")]
+        [Index("CityName",2,IsUnique =true)]
         public string Name { get; set; }
 
         [Required]
         [Range(1,double.MaxValue)]
+        [Index("CityName",1, IsUnique = true)]
         public int DepartmentId { get; set; }
         
         //obtenemos el id de departamento
@@ -25,5 +28,8 @@ namespace ECommerce.Models
         
         //Relacion con la tabla Compania 
         public virtual ICollection<Company> Companies { get; set; }
+
+        //Relacion con la tabla Compania 
+        public virtual ICollection<User> Users { get; set; }
     }
 }

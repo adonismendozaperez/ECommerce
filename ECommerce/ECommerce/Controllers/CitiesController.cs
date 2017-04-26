@@ -53,20 +53,34 @@ namespace ECommerce.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CityId,Name,DepartmentId")] City city)
+        public ActionResult Create( City city)
         {
             if (ModelState.IsValid)
             {
-                db.Cities.Add(city);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    db.Cities.Add(city);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException != null &&
+                                          ex.InnerException.InnerException != null &&
+                                          ex.InnerException.InnerException.Message.Contains("REFERENCE"))
+                    {
+                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
+
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                }
             }
 
             ViewBag.DepartmentId = new SelectList(
-                CombosHelper.GetDepartments(),
-                "DepartmentId",
-                "Name",
-                city.DepartmentId);
+                CombosHelper.GetDepartments(),"DepartmentId","Name",city.DepartmentId);
             return View(city);
         }
 
@@ -95,13 +109,31 @@ namespace ECommerce.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CityId,Name,DepartmentId")] City city)
+        public ActionResult Edit( City city)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(city).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    db.Entry(city).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+
+                    if (ex.InnerException != null &&
+                      ex.InnerException.InnerException != null &&
+                      ex.InnerException.InnerException.Message.Contains("REFERENCE"))
+                    {
+                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
+
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                }
             }
             ViewBag.DepartmentId = new SelectList(
                 CombosHelper.GetDepartments(),
