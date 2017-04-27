@@ -25,6 +25,32 @@ namespace ECommerce.Classes
             roleManager.Create(new IdentityRole(roleName));
         }
     }
+        //para borrar un usuario en las multiples tablas, las que creo el ASP y User
+        public static bool DeleteUser(string userName)
+        {
+            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(userContext));
+            var userAsp = userManager.FindByEmail(userName);
+            if (userAsp == null)
+            {
+                return false;
+            }
+            var reponse =userManager.Delete(userAsp);
+           return reponse.Succeeded;
+        }
+
+        public static bool UptadeUserName(string currentUserName, string newUserName)
+        {
+            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(userContext));
+            var userAsp = userManager.FindByEmail(currentUserName);
+            if (userAsp == null)
+            {
+                return false;
+            }
+            userAsp.UserName = newUserName;
+            userAsp.Email = newUserName;
+            var reponse = userManager.Update(userAsp);
+            return reponse.Succeeded;
+        }
 
     public static void CheckSuperUser()
     {

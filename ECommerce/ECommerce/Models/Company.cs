@@ -25,9 +25,7 @@ namespace ECommerce.Models
 
         [Required]
         [MaxLength(200)]
-        public string Address { get; set; }
-
-       
+        public string Address { get; set; }    
       
         [DataType(DataType.ImageUrl)]
         public string Logo { get; set; }
@@ -49,5 +47,13 @@ namespace ECommerce.Models
         //obtenemos el id de la ciudad
         public virtual City City { get; set; }
 
+        //Relacion con la tabla category 
+        public virtual ICollection<Category> Categories { get; set; }
+
+        //Relacion con la tabla tax 
+        public virtual ICollection<Tax> Taxes { get; set; }
+
+        //Relacion con la tabla Products 
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

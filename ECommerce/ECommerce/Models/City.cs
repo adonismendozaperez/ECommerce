@@ -21,6 +21,7 @@ namespace ECommerce.Models
         [Required]
         [Range(1,double.MaxValue)]
         [Index("CityName",1, IsUnique = true)]
+        [Display(Name = "Department")]
         public int DepartmentId { get; set; }
         
         //obtenemos el id de departamento
