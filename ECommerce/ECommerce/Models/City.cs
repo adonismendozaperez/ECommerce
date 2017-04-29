@@ -32,5 +32,7 @@ namespace ECommerce.Models
 
         //Relacion con la tabla Compania 
         public virtual ICollection<User> Users { get; set; }
+        //relacion con la tabla Warehouse
+        public virtual ICollection<Warehouse> Warehouses { get; set; }
     }
 }

@@ -50,10 +50,14 @@ namespace ECommerce.Models
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
+        public double Stock { get {return inventories.Sum(c=>c.Stock); } }
+
         [DataType(DataType.ImageUrl)]
         public string Image { get; set; }
 
         [NotMapped]
+        [Display(Name = "Image")]
         public HttpPostedFileBase ImageFiler { get; set; }
 
         
@@ -65,5 +69,7 @@ namespace ECommerce.Models
 
         //obtenemos el id de Tax
         public virtual Tax Tax { get; set; }
+
+        public virtual ICollection<Inventory> inventories { get; set; }
     }
 }

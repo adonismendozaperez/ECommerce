@@ -55,5 +55,7 @@ namespace ECommerce.Models
 
         //Relacion con la tabla Products 
         public virtual ICollection<Product> Products { get; set; }
+        //relacion con la tabla Warehouse
+        public virtual ICollection<Warehouse> Warehouses { get; set; }
     }
 }
