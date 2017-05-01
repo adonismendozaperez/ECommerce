@@ -26,5 +26,7 @@ namespace ECommerce.Models
         public virtual ICollection<User> Users { get; set; }
         //relacion con la tabla Warehouse
         public virtual ICollection<Warehouse> Warehouses { get; set; }
+        //relacion con la tabla Customers
+        public virtual ICollection<Customer> Customers { get; set; }
     }
 }

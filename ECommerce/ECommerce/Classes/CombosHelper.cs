@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Collections;
 
 namespace ECommerce.Classes
 {
@@ -19,6 +20,17 @@ namespace ECommerce.Classes
                 Name = "[Select a department........]"
             });
             return  department.OrderBy(x => x.Name).ToList();
+        }
+
+        public static List<Product> GetProducts(int companyId)
+        {
+            var Products = db.Products.Where(c => c.CompanyId == companyId).ToList();
+            Products.Add(new Product
+            {
+                ProductId = 0,
+                Name = "[Select a product........]"
+            });
+            return Products.OrderBy(x => x.Name).ToList();
         }
 
         public static List<City> GetCities()
@@ -62,6 +74,17 @@ namespace ECommerce.Classes
                 Name = "[Select a category........]"
             });
             return categories.OrderBy(x => x.Name).ToList();
+        }
+
+        public static List<Customer> GetCustomers(int companyId)
+        {
+            var customers = db.Customers.Where(c => c.CompanyId == companyId).ToList();
+            customers.Add(new Customer
+            {
+                CustomerId = 0,
+                FirstName = "[Select a customer........]"
+            });
+            return customers.OrderBy(x => x.FirstName).ThenBy(x=>x.LastName).ToList();
         }
 
         public void Dispose()

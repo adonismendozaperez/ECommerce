@@ -1,0 +1,146 @@
+﻿@model ECommerce.Models.NewOrderView
+
+@{
+    ViewBag.Title = "Create";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Orders</h4>
+                <hr />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CustomerId, "CustomerId", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList("CustomerId", null, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.CustomerId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remarks, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Remarks, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Remarks, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-success" />
+                        
+                        @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-warning" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h4>Details</h4>
+                <hr />
+                @Html.ActionLink("Add Product", "AddProduct", new { }, new { @class = "btn btn-info" })
+                @if (Model.Details.Count() == 0)
+                {
+                    <h5>No Details Added yet</h5>
+                }
+                else
+                {
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Details[0].Product.Image)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Details[0].Product.Name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Details[0].TaxRate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Details[0].Price)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Details[0].Quantity)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Details[0].Value)
+                            </th>
+                            <th></th>
+                        </tr>
+
+                        @foreach (var item in Model.Details)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Product.Image))
+                                    {
+                                        <img src="@Url.Content(item.Product.Image)" alt="Image" style="width:100px;height:150px;max-width: 100%; height: auto;" />
+                                    }
+
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Product.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TaxRate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Price)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Quantity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Value)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Delete", "DeleteProduct", new { id = item.ProductId },new {onClick="return confirm('Are you sure to deleted this record ?')"})
+                                </td>
+                            </tr>   
+                        }
+                        <tr>
+                            <th colspan="4">
+                                <strong>Total: </strong>
+                            </th>
+
+                            <th>
+                                <strong> @Html.DisplayFor(model => Model.TotalQuantity)</strong>
+                            </th>
+                            <th>
+                                <strong> @Html.DisplayFor(model => Model.TotalValue)</strong>
+                            </th>
+                        </tr>
+
+                    </table>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+}
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
