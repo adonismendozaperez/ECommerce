@@ -28,10 +28,17 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control" } })
+                        <div class='input-group date' id='datepicker' style="width:280px">
+                            @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control" } })
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar">
+                                </span>
+                            </span>
+                        </div>
                         @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
                     </div>
                 </div>
+
 
                 <div class="form-group">
                     @Html.LabelFor(model => model.Remarks, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -44,7 +51,7 @@
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <input type="submit" value="Save" class="btn btn-success" />
-                        
+
                         @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-warning" })
                     </div>
                 </div>
@@ -52,7 +59,7 @@
             <div class="col-md-6">
                 <h4>Details</h4>
                 <hr />
-                @Html.ActionLink("Add Product", "AddProduct", new { }, new { @class = "btn btn-info" })
+                @Html.ActionLink("Add Product", "AddProduct", "Orders", new { }, new { @class = "dialog-window btn btn-info" })
                 @if (Model.Details.Count() == 0)
                 {
                     <h5>No Details Added yet</h5>
@@ -108,9 +115,9 @@
                                     @Html.DisplayFor(modelItem => item.Value)
                                 </td>
                                 <td>
-                                    @Html.ActionLink("Delete", "DeleteProduct", new { id = item.ProductId },new {onClick="return confirm('Are you sure to deleted this record ?')"})
+                                    @Html.ActionLink("Delete", "DeleteProduct", new { id = item.ProductId }, new { onClick = "return confirm('Are you sure to deleted this record ?')" })
                                 </td>
-                            </tr>   
+                            </tr>
                         }
                         <tr>
                             <th colspan="4">
@@ -138,9 +145,51 @@
     </div>
 }
 
+<div class="modal fade" id="AddProduct" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h2 class="modal-title"> </h2>
+            </div>
+            <div class="modal-body">
+                <div class="te"> Please wait...</div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(function () {
+            $('#datepicker').datetimepicker({ format: 'YYYY/MM/DD' });
+        });
+        $(document).ready(function () {
+            $("body").on("click", "a.dialog-window", null, function (e) {
+                e.preventDefault();
+                var $link = $(this);
+                var title = $link.text();
+                $('#AddProduct .modal-title').html(title);
+                var url = $(this).attr('href');
+                if (url.indexOf('#') == 0) {
+                    $('#AddProduct').modal('show');
+                }
+                else {
+                    $.get(url, function (data) {
+                        $('#AddProduct .te').html(data);
+                        $('#AddProduct').modal();
+                    }).success(function () { $('input:text:visible:first').focus(); });
+                }
+            });
+        });
+
+
+    </script>
+
 }
 

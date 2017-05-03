@@ -41,62 +41,53 @@ namespace ECommerce.Controllers
         // GET: Users/Create
         public ActionResult Create()
         {
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name");
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(0), "CityId", "Name");
             ViewBag.CompanyId = new SelectList(CombosHelper.GetCompanies(), "CompanyId", "Name");
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name");
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create( User user)
         {
             if (ModelState.IsValid)
             {
-                try
-                {
+                
                     db.Users.Add(user);
-                    db.SaveChanges();
-                    UsersHelper.CreateUserASP(user.UserName, "User");
+                   var reponse =  DbHelper.SaveChanges(db);
+                    if (reponse.Succeeded)
+                    {
+                        UsersHelper.CreateUserASP(user.UserName, "User");
+                        
+                    }
+                    ModelState.AddModelError(string.Empty, reponse.Message);
+                    
 
                     if (user.PhotoFile != null)
                     {
 
                         var folder = "~/Content/Photos";
                         var file = string.Format("{0}.jpg", user.UserId);
-                        var reponse = FilesHelper.UploadPhoto(user.PhotoFile, folder, file);
-                        if (reponse)
+                        var reponses = FilesHelper.UploadPhoto(user.PhotoFile, folder, file);
+                        if (reponses)
                         {
                             var pic = string.Format("{0}/{1}", folder, file);
                             user.Photo = pic;
                             db.Entry(user).State = EntityState.Modified;
-                            db.SaveChanges();
+                            DbHelper.SaveChanges(db);
+                            if (reponse.Succeeded)
+                            {
+                                return RedirectToAction("Index");
+                            }
+
+                         }
+                            ModelState.AddModelError(string.Empty, reponse.Message);
                         }
-
-                    }
-                    return RedirectToAction("Index");
-                }
-                catch (Exception ex)
-                {
-
-                    if (ex.InnerException != null &&
-                        ex.InnerException.InnerException != null &&
-                        ex.InnerException.InnerException.Message.Contains("REFERENCE"))
-                    {
-                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
-
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                }
             }
 
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", user.CityId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(user.DepartmentId), "CityId", "Name", user.CityId);
             ViewBag.CompanyId = new SelectList(CombosHelper.GetCompanies(), "CompanyId", "Name", user.CompanyId);
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", user.DepartmentId);
             return View(user);
@@ -114,30 +105,27 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", user.CityId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(user.DepartmentId), "CityId", "Name", user.CityId);
             ViewBag.CompanyId = new SelectList(CombosHelper.GetCompanies(), "CompanyId", "Name", user.CompanyId);
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", user.DepartmentId);
             return View(user);
         }
 
-        // POST: Users/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+     
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "UserId,UserName,FirstName,LastName,Phone,Address,Photo,DepartmentId,CityId,CompanyId")] User user)
         {
             if (ModelState.IsValid)
             {
-                try
-                {
+              
                     if (user.PhotoFile != null)
                     {
                         var pic = string.Empty;
                         var folder = "~/Content/Photos";
                         var file = string.Format("{0}.jpg", user.UserId);
-                        var reponse = FilesHelper.UploadPhoto(user.PhotoFile, folder, file);
-                        if (reponse)
+                        var reponses = FilesHelper.UploadPhoto(user.PhotoFile, folder, file);
+                        if (reponses)
                         {
                             pic = string.Format("{0}/{1}", folder, file);
                             user.Photo = pic;
@@ -152,26 +140,15 @@ namespace ECommerce.Controllers
                     }
                     db2.Dispose();
                     db.Entry(user).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-                catch (Exception ex)
-                {
-
-                    if (ex.InnerException != null &&
-                     ex.InnerException.InnerException != null &&
-                     ex.InnerException.InnerException.Message.Contains("REFERENCE"))
-                    {
-                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
-
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                }
+                     var reponse = DbHelper.SaveChanges(db);
+                     if (reponse.Succeeded)
+                         {
+                            return RedirectToAction("Index");
+                         }
+                ModelState.AddModelError(string.Empty, reponse.Message);
             }
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", user.CityId);
+            
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(user.DepartmentId), "CityId", "Name", user.CityId);
             ViewBag.CompanyId = new SelectList(CombosHelper.GetCompanies(), "CompanyId", "Name", user.CompanyId);
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", user.DepartmentId);
             return View(user);
@@ -199,19 +176,14 @@ namespace ECommerce.Controllers
         {
             User user = db.Users.Find(id);
             db.Users.Remove(user);
-//ponerle Try cath, para no dejar eliminar usuarios con dependencias
-            db.SaveChanges();
-            UsersHelper.DeleteUser(user.UserName);
-            return RedirectToAction("Index");
-        }
 
-        //Metodo para obtener las ciudades relacionadas con los departments
-        public JsonResult GetCities(int DepartmentId)
-        {
-            db.Configuration.ProxyCreationEnabled = false;
-            var cities = db.Cities.Where(x => x.DepartmentId == DepartmentId);
-            return Json(cities);
-
+            var reponse= DbHelper.SaveChanges(db);
+            if (reponse.Succeeded)
+            {
+                UsersHelper.DeleteUser(user.UserName);
+                return RedirectToAction("Index");
+            }
+            return View(user);   
         }
 
         protected override void Dispose(bool disposing)

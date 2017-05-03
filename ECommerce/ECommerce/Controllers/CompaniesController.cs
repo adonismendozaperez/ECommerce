@@ -42,15 +42,13 @@ namespace ECommerce.Controllers
         public ActionResult Create()
         {
             ViewBag.CityId = new SelectList(
-                CombosHelper.GetCities(),"CityId","Name");
+                CombosHelper.GetCities(0),"CityId","Name");
             ViewBag.DepartmentId = new SelectList(
                 CombosHelper.GetDepartments(),"DepartmentId","Name");
             return View();
         }
 
-        // POST: Companies/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Company company)
@@ -58,8 +56,7 @@ namespace ECommerce.Controllers
             if (ModelState.IsValid)
             {
              
-                try
-                {
+                
                     db.Companies.Add(company);
                     db.SaveChanges();
 
@@ -68,8 +65,8 @@ namespace ECommerce.Controllers
                         
                         var folder = "~/Content/Logos";
                         var file = string.Format("{0}.jpg", company.CompanyId);
-                        var reponse = FilesHelper.UploadPhoto(company.LogoFile, folder,file);
-                        if (reponse)
+                        var reponses = FilesHelper.UploadPhoto(company.LogoFile, folder,file);
+                        if (reponses)
                         {
                             var pic = string.Format("{0}/{1}", folder, file);
                             company.Logo = pic;
@@ -80,26 +77,11 @@ namespace ECommerce.Controllers
                     }
                     
                     return RedirectToAction("Index");
-                }
-                catch (Exception ex)
-                {
-
-                    if (ex.InnerException != null &&
-                        ex.InnerException.InnerException != null &&
-                        ex.InnerException.InnerException.Message.Contains("REFERENCE"))
-                    {
-                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
-
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                }
+                
             }
 
             ViewBag.CityId = new SelectList(
-                CombosHelper.GetCities(),"CityId", "Name", company.CityId);
+                CombosHelper.GetCities(company.DepartmentId),"CityId", "Name", company.CityId);
 
             ViewBag.DepartmentId = new SelectList(
                 CombosHelper.GetDepartments(),"DepartmentId","Name",company.DepartmentId);
@@ -120,7 +102,7 @@ namespace ECommerce.Controllers
                 return HttpNotFound();
             }
             ViewBag.CityId = new SelectList(
-                CombosHelper.GetCities(),"CityId","Name", company.CityId);
+                CombosHelper.GetCities(company.DepartmentId),"CityId","Name", company.CityId);
 
             ViewBag.DepartmentId = new SelectList(
                 CombosHelper.GetDepartments(), "DepartmentId","Name", company.DepartmentId);
@@ -172,7 +154,7 @@ namespace ECommerce.Controllers
                     }
                 }
             }
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(),"CityId", "Name", company.CityId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(company.DepartmentId),"CityId", "Name", company.CityId);
 
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId","Name",company.DepartmentId);
             return View(company);
@@ -204,14 +186,7 @@ namespace ECommerce.Controllers
             return RedirectToAction("Index");
         }
 
-        //Metodo para obtener las ciudades relacionadas con los departments
-        public JsonResult GetCities(int DepartmentId)
-        {
-            db.Configuration.ProxyCreationEnabled = false;
-            var cities = db.Cities.Where(x => x.DepartmentId == DepartmentId);
-            return Json(cities);
 
-        }
 
         protected override void Dispose(bool disposing)
         {

@@ -47,7 +47,7 @@ namespace ECommerce.Controllers
             }
            
             ViewBag.ProductId = new SelectList(CombosHelper.GetProducts(user.CompanyId), "ProductId", "Name");
-            return View(productview);
+            return PartialView(productview);
         }
 
         public ActionResult AddProduct()
@@ -55,7 +55,7 @@ namespace ECommerce.Controllers
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             ViewBag.ProductId = new SelectList(CombosHelper.GetProducts(user.CompanyId), "ProductId", "Name");
 
-            return View();
+            return PartialView();
         }
 
         public ActionResult DeleteProduct(int? id)
@@ -115,40 +115,50 @@ namespace ECommerce.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Order order)
+        public ActionResult Create(NewOrderView NewOrder)
         {
             if (ModelState.IsValid)
             {
-                db.Orders.Add(order);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var reponse = MovementsHelper.NewOrder(NewOrder, User.Identity.Name);
+                if (reponse.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+                ModelState.AddModelError(string.Empty, reponse.Message);
             }
 
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             ViewBag.CustomerId = new SelectList(CombosHelper.GetCustomers(user.CompanyId), "CustomerId", "FullName");
-            return View(order);
+            ViewBag.Details = db.OrderDetailTmps.Where(tmp => tmp.UserName == User.Identity.Name).ToList();
+            return View(NewOrder);
         }
 
         // GET: Orders/Edit/5
         public ActionResult Edit(int? id)
         {
+            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Order order = db.Orders.Find(id);
+            var order = db.Orders.Find(id);
             if (order == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.CustomerId = new SelectList(db.Customers, "CustomerId", "UserName", order.CustomerId);
-            ViewBag.StateId = new SelectList(db.States, "StateId", "Description", order.StateId);
+            ViewBag.CustomerId = new SelectList(CombosHelper.GetCustomers(user.CompanyId), "CustomerId", "UserName", order.CustomerId);
             return View(order);
+
+
+            //var NewOrder = new NewOrderView
+            //{
+            //    Date = DateTime.Now,
+            //    Details = db.OrderDetailTmps.Where(tmp => tmp.UserName == User.Identity.Name).ToList(),
+
+            //};
+            //return View(NewOrder);
         }
 
-        // POST: Orders/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Order order)
@@ -160,7 +170,6 @@ namespace ECommerce.Controllers
                 return RedirectToAction("Index");
             }
             ViewBag.CustomerId = new SelectList(db.Customers, "CustomerId", "UserName", order.CustomerId);
-            ViewBag.StateId = new SelectList(db.States, "StateId", "Description", order.StateId);
             return View(order);
         }
 

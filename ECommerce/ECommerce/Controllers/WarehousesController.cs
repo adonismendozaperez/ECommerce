@@ -42,7 +42,7 @@ namespace ECommerce.Controllers
         // GET: Warehouses/Create
         public ActionResult Create()
         {
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name");
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(0), "CityId", "Name");
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name");
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             var warehouses = new Warehouse { CompanyId = user.CompanyId ,};
@@ -56,30 +56,18 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
+                
+                db.Warehouses.Add(warehouse);
+                var reponse = DbHelper.SaveChanges(db);
+                if (reponse.Succeeded)
                 {
-                    db.Warehouses.Add(warehouse);
-                    db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-                catch (Exception ex)
-                {
-
-                    if (ex.InnerException != null &&
-                     ex.InnerException.InnerException != null &&
-                     ex.InnerException.InnerException.Message.Contains("REFERENCE"))
-                    {
-                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
-
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                }
+                ModelState.AddModelError(string.Empty, reponse.Message);  
+                
             }
 
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", warehouse.CityId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(warehouse.DepartmentId), "CityId", "Name", warehouse.CityId);
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", warehouse.DepartmentId);
             return View(warehouse);
         }
@@ -96,7 +84,7 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", warehouse.CityId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(warehouse.DepartmentId), "CityId", "Name", warehouse.CityId);
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", warehouse.DepartmentId);
             return View(warehouse);
         }
@@ -108,29 +96,17 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
+                
+                  db.Entry(warehouse).State = EntityState.Modified;
+                  var reponse=  DbHelper.SaveChanges(db);
+                if (reponse.Succeeded)
                 {
-                    db.Entry(warehouse).State = EntityState.Modified;
-                    db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-                catch (Exception ex)
-                {
+                ModelState.AddModelError(string.Empty, reponse.Message);
 
-                    if (ex.InnerException != null &&
-                     ex.InnerException.InnerException != null &&
-                     ex.InnerException.InnerException.Message.Contains("REFERENCE"))
-                    {
-                        ModelState.AddModelError(string.Empty, "There are a record with the same value");
-
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                }
             }
-            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", warehouse.CityId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(warehouse.DepartmentId), "CityId", "Name", warehouse.CityId);
             ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", warehouse.DepartmentId);
             return View(warehouse);
         }
@@ -157,8 +133,15 @@ namespace ECommerce.Controllers
         {
             Warehouse warehouse = db.Warehouses.Find(id);
             db.Warehouses.Remove(warehouse);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            var reponse= DbHelper.SaveChanges(db);
+            if (reponse.Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+            ModelState.AddModelError(string.Empty, reponse.Message);
+            return View(warehouse);
+            
+
         }
 
         protected override void Dispose(bool disposing)

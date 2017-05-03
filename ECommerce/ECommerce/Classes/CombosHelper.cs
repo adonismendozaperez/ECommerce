@@ -33,9 +33,9 @@ namespace ECommerce.Classes
             return Products.OrderBy(x => x.Name).ToList();
         }
 
-        public static List<City> GetCities()
+        public static List<City> GetCities(int DeparmentId)
         {
-            var city = db.Cities.ToList();
+            var city = db.Cities.Where(d=>d.DepartmentId == DeparmentId).ToList();
             city.Add(new City
             {
                 CityId = 0,
