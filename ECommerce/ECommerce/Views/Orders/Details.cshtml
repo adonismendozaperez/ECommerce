@@ -1,4 +1,4 @@
-﻿@model ECommerce.Models.Order
+﻿@model ECommerce.Models.OrderDetail
 
 @{
     ViewBag.Title = "Details";
@@ -10,41 +10,94 @@
     <h4>Order</h4>
     <hr />
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.UserName)
-        </dt>
 
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Order.Customer.FullName)
+        </dt>
         <dd>
-            @Html.DisplayFor(model => model.Customer.UserName)
+            @Html.DisplayFor(model => model.Order.Customer.FullName)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.State.Description)
+            @Html.DisplayNameFor(model => model.Order.Date)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.State.Description)
+            @Html.DisplayFor(model => model.Order.Date)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Date)
+            @Html.DisplayNameFor(model => model.Order.Customer.UserName)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Date)
+            @Html.DisplayFor(model => model.Order.Customer.UserName)
         </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Remarks)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Remarks)
-        </dd>
 
     </dl>
-</div>
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Product.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Product.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaxRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+        </tr>
+        @foreach (var item in Model.Details)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.Product.Image))
+                {
+                        <img src="@Url.Content(item.Product.Image)" alt="Image" style="width:100px;height:150px;max-width: 100%; height: auto;" />
+                    }
+
+                </td>
+                <td>
+                    @Html.DisplayNameFor(model => model.Product.Name)
+                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.TaxRate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+
+            </tr>
+        }
+        <tr>
+            <th colspan="4">
+                <strong>Total: </strong>
+            </th>
+
+            <th>
+                <strong> @Html.DisplayFor(model => Model.TotalQuantity)</strong>
+            </th>
+            <th>
+                <strong> @Html.DisplayFor(model => Model.TotalValue)</strong>
+            </th>
+        </tr>
+
+    </table>
+
+</div>-
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.OrderId }) |
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back", "Index",new { }, new { @class="btn btn-default"})
 </p>
+

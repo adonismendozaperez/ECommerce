@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
 using ECommerce.Classes;
+using PagedList;
 
 namespace ECommerce.Controllers
 {
@@ -17,11 +18,12 @@ namespace ECommerce.Controllers
         private ECommerceContext db = new ECommerceContext();
 
         // GET: Customers
-        public ActionResult Index()
+        public ActionResult Index(int? page = null)
         {
+            page = (page ?? 1);
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            var customers = db.Customers.Where(c=>c.CompanyId == user.CompanyId).Include(c => c.City).Include(c => c.Department);
-            return View(customers.ToList());
+            var customers = db.Customers.Where(c=>c.CompanyId == user.CompanyId).Include(c => c.City).Include(c => c.Department).OrderBy(c => c.FirstName);
+            return View(customers.ToPagedList((int)page, 10));
         }
 
         // GET: Customers/Details/5
@@ -132,7 +134,7 @@ namespace ECommerce.Controllers
             var reponse = DbHelper.SaveChanges(db);
             if (reponse.Succeeded)
             {
-                UsersHelper.DeleteUser(customer.UserName);
+                UsersHelper.DeleteUser(customer.UserName,"Customer");
                 return RedirectToAction("Index");
             }
             ModelState.AddModelError(string.Empty, reponse.Message);

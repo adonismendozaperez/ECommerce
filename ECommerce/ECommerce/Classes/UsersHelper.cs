@@ -26,7 +26,7 @@ namespace ECommerce.Classes
         }
     }
         //para borrar un usuario en las multiples tablas, las que creo el ASP y User
-        public static bool DeleteUser(string userName)
+        public static bool DeleteUser(string userName, string rol)
         {
             var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(userContext));
             var userAsp = userManager.FindByEmail(userName);
@@ -34,7 +34,7 @@ namespace ECommerce.Classes
             {
                 return false;
             }
-            var reponse =userManager.Delete(userAsp);
+            var reponse = userManager.RemoveFromRole(userAsp.Id, rol);
            return reponse.Succeeded;
         }
 
@@ -70,14 +70,18 @@ namespace ECommerce.Classes
     public static void CreateUserASP(string email, string roleName)
     {
         var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(userContext));
-
-        var userASP = new ApplicationUser
+            var userASP = userManager.FindByEmail(email);
+            if(userASP == null)
             {
-            Email = email,
-            UserName = email,
-        };
+                userASP = new ApplicationUser
+                {
+                    Email = email,
+                    UserName = email,
+                };
 
-        userManager.Create(userASP, email);
+                userManager.Create(userASP, email);
+            }
+        
         userManager.AddToRole(userASP.Id, roleName);
     }
 

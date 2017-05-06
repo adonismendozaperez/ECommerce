@@ -1,5 +1,5 @@
-﻿@model IEnumerable<ECommerce.Models.Order>
-
+﻿@model PagedList.IPagedList<ECommerce.Models.Order>
+@using PagedList.Mvc;
 @{
     ViewBag.Title = "Orders";
 }
@@ -12,16 +12,16 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Customer.FullName)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Customer.FullName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.State.Description)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().State.Description)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Date)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Date)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Remarks)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Remarks)
         </th>
         <th></th>
     </tr>
@@ -42,10 +42,18 @@
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.OrderId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.OrderId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.orderDetails}) |
             @Html.ActionLink("Delete", "Delete", new { id=item.OrderId })
         </td>
     </tr>
 }
 
 </table>
+Page: @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber), of: @Model.PageCount
+@Html.PagedListPager(Model, page => Url.Action("Index", new
+{
+    page,
+    sortOrder =
+    ViewBag.CurrentSort,
+    currentFilter = ViewBag.CurrentFilter
+}))

@@ -22,6 +22,13 @@ namespace ECommerce.Classes
             return  department.OrderBy(x => x.Name).ToList();
         }
 
+        public static List<Product> GetProducts(int companyId, bool sw)
+        {
+            var products = db.Products.Where(p => p.CompanyId == companyId).ToList();
+            return products.OrderBy(p => p.Description).ToList();
+        }
+
+
         public static List<Product> GetProducts(int companyId)
         {
             var Products = db.Products.Where(c => c.CompanyId == companyId).ToList();

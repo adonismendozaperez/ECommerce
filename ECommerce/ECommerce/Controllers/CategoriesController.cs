@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
+using PagedList;
 
 namespace ECommerce.Controllers
 {
@@ -17,15 +18,16 @@ namespace ECommerce.Controllers
 
       
         // GET: Categories
-        public ActionResult Index()
+        public ActionResult Index(int? page = null)
         {
-           var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            page = (page ?? 1);
+            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             if (user == null)
             {
                 return RedirectToAction("Index", "Home");
             }
-            var categories = db.Categories.Where(c=> c.CompanyId == user.CompanyId);
-            return View(categories.ToList());
+            var categories = db.Categories.Where(c=> c.CompanyId == user.CompanyId).OrderBy(c=>c.Name);
+            return View(categories.ToPagedList((int)page, 5));
         }
 
         // GET: Categories/Details/5

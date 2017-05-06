@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -37,6 +38,16 @@ namespace ECommerce.Models
         [Range(0, double.MaxValue, ErrorMessage = "You must enter values in {0} between {1} and {2}")]
         public double Quantity { get; set; }
 
+        [NotMapped]
+        public List<OrderDetailTmp> Details { get; set; }
+
+        [NotMapped]
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
+        public double TotalQuantity { get { return Details == null ? 0 : Details.Sum(d => d.Quantity); } }
+
+        [NotMapped]
+        [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = false)]
+        public decimal TotalValue { get { return Details == null ? 0 : Details.Sum(d => d.Value); } }
 
         public virtual Order Order{ get; set; }
 

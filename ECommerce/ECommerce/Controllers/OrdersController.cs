@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
 using ECommerce.Classes;
+using PagedList;
 
 namespace ECommerce.Controllers
 {
@@ -53,7 +54,7 @@ namespace ECommerce.Controllers
         public ActionResult AddProduct()
         {
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            ViewBag.ProductId = new SelectList(CombosHelper.GetProducts(user.CompanyId), "ProductId", "Name");
+            ViewBag.ProductId = new SelectList(CombosHelper.GetProducts(user.CompanyId,true), "ProductId", "Name");
 
             return PartialView();
         }
@@ -76,11 +77,12 @@ namespace ECommerce.Controllers
         }
 
         // GET: Orders
-        public ActionResult Index()
+        public ActionResult Index(int? page = null)
         {
+            page = (page ?? 1);
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            var orders = db.Orders.Where(o=> o.CompanyId == user.CompanyId).Include(o => o.Customer).Include(o => o.State);
-            return View(orders.ToList());
+            var orders = db.Orders.Where(o=> o.CompanyId == user.CompanyId).Include(o => o.Customer).Include(o => o.State).OrderBy(o=>o.Date);
+            return View(orders.ToPagedList((int)page, 5));
         }
 
         // GET: Orders/Details/5
@@ -90,7 +92,7 @@ namespace ECommerce.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Order order = db.Orders.Find(id);
+            OrderDetail order = db.OrderDetails.Find(id);
             if (order == null)
             {
                 return HttpNotFound();
@@ -148,15 +150,6 @@ namespace ECommerce.Controllers
             }
             ViewBag.CustomerId = new SelectList(CombosHelper.GetCustomers(user.CompanyId), "CustomerId", "UserName", order.CustomerId);
             return View(order);
-
-
-            //var NewOrder = new NewOrderView
-            //{
-            //    Date = DateTime.Now,
-            //    Details = db.OrderDetailTmps.Where(tmp => tmp.UserName == User.Identity.Name).ToList(),
-
-            //};
-            //return View(NewOrder);
         }
 
         [HttpPost]

@@ -1,5 +1,5 @@
-﻿@model IEnumerable<ECommerce.Models.Product>
-
+﻿@model PagedList.IPagedList<ECommerce.Models.Product>
+@using PagedList.Mvc;
 @{
     ViewBag.Title = "Index";
 }
@@ -12,25 +12,25 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Category.Name)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Category.Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Tax.Name)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Tax.Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Stock)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Stock)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.BarCode)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().BarCode)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Price)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Price)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Image)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Image)
         </th>
         <th></th>
     </tr>
@@ -71,3 +71,11 @@
 }
 
 </table>
+Page: @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber), of: @Model.PageCount
+@Html.PagedListPager(Model, page => Url.Action("Index", new
+{
+    page,
+    sortOrder =
+    ViewBag.CurrentSort,
+    currentFilter = ViewBag.CurrentFilter
+}))
