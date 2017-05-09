@@ -11,6 +11,15 @@ namespace ECommerce.Classes
     {
       private static ECommerceContext db = new ECommerceContext();
         //Devuelve una lista de Departments
+
+        
+        public static List<Product> GetProducts(int companyId, bool sw)
+        {
+            var products = db.Products.Where(p => p.CompanyId == companyId).ToList();
+            return products.OrderBy(p => p.Description).ToList();
+        }
+
+        #region GetDepartments
         public static List<Department> GetDepartments()
         {
             var department = db.Departments.ToList();
@@ -19,16 +28,11 @@ namespace ECommerce.Classes
                 DepartmentId = 0,
                 Name = "[Select a department........]"
             });
-            return  department.OrderBy(x => x.Name).ToList();
+            return department.OrderBy(x => x.Name).ToList();
         }
+        #endregion
 
-        public static List<Product> GetProducts(int companyId, bool sw)
-        {
-            var products = db.Products.Where(p => p.CompanyId == companyId).ToList();
-            return products.OrderBy(p => p.Description).ToList();
-        }
-
-
+        #region GetProducts
         public static List<Product> GetProducts(int companyId)
         {
             var Products = db.Products.Where(c => c.CompanyId == companyId).ToList();
@@ -39,10 +43,12 @@ namespace ECommerce.Classes
             });
             return Products.OrderBy(x => x.Name).ToList();
         }
+        #endregion
 
+        #region GetCities
         public static List<City> GetCities(int DeparmentId)
         {
-            var city = db.Cities.Where(d=>d.DepartmentId == DeparmentId).ToList();
+            var city = db.Cities.Where(d => d.DepartmentId == DeparmentId).ToList();
             city.Add(new City
             {
                 CityId = 0,
@@ -50,7 +56,9 @@ namespace ECommerce.Classes
             });
             return city.OrderBy(x => x.Name).ToList();
         }
+        #endregion
 
+        #region GetCompanies
         public static List<Company> GetCompanies()
         {
             var company = db.Companies.ToList();
@@ -61,6 +69,9 @@ namespace ECommerce.Classes
             });
             return company.OrderBy(x => x.Name).ToList();
         }
+        #endregion
+
+        #region GetTaxes
         public static List<Tax> GetTaxes(int companyId)
         {
             var taxes = db.Taxes.Where(c => c.CompanyId == companyId).ToList();
@@ -71,18 +82,22 @@ namespace ECommerce.Classes
             });
             return taxes.OrderBy(x => x.Name).ToList();
         }
+        #endregion
 
+        #region GetCategories
         public static List<Category> GetCategories(int companyId)
         {
-            var categories = db.Categories.Where(c=>c.CompanyId == companyId).ToList();
+            var categories = db.Categories.Where(c => c.CompanyId == companyId).ToList();
             categories.Add(new Category
             {
-                CategoryId  = 0,
+                CategoryId = 0,
                 Name = "[Select a category........]"
             });
             return categories.OrderBy(x => x.Name).ToList();
         }
+        #endregion
 
+        #region GetCustomers
         public static List<Customer> GetCustomers(int companyId)
         {
             var customers = db.Customers.Where(c => c.CompanyId == companyId).ToList();
@@ -91,8 +106,10 @@ namespace ECommerce.Classes
                 CustomerId = 0,
                 FirstName = "[Select a customer........]"
             });
-            return customers.OrderBy(x => x.FirstName).ThenBy(x=>x.LastName).ToList();
+            return customers.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ToList();
         }
+        #endregion
+
 
         public void Dispose()
         {
