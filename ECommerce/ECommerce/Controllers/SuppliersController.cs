@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
 using ECommerce.Classes;
+using PagedList;
 
 namespace ECommerce.Controllers
 {
@@ -17,11 +18,12 @@ namespace ECommerce.Controllers
         private ECommerceContext db = new ECommerceContext();
 
         // GET: Suppliers
-        public ActionResult Index()
+        public ActionResult Index(int? page = null)
         {
+            page = (page ?? 1);
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            var suppliers = db.Suppliers.Where(c => c.CompanyId == user.CompanyId).Include(s => s.City).Include(s => s.Department);
-            return View(suppliers.ToList());
+            var suppliers = db.Suppliers.Where(c => c.CompanyId == user.CompanyId).Include(s => s.City).Include(s => s.Department).OrderBy(s=>s.FirstName);
+            return View(suppliers.ToPagedList((int)page, 10));
         }
 
         // GET: Suppliers/Details/5

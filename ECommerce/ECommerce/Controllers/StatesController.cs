@@ -20,7 +20,8 @@ namespace ECommerce.Controllers
         public ActionResult Index(int? page = null)
         {
             page = (page ?? 1);
-            return View(db.States.ToPagedList((int)page, 5));
+            var states = db.States.OrderBy(c => c.Description);
+            return View(states.ToPagedList((int)page, 5));
         }
 
         // GET: States/Details/5
